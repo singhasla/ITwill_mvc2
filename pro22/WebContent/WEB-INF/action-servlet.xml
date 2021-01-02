@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+
+<!-- action-servlet.xml의 역할  
+	 1. 뷰 관련 경로설정 하는  InternalResourceViewResolver 빈 생성
+	 
+	 2. MemberControllerImpl컨트롤러 빈 생성 
+	 
+	 2-1. MemberController객체에 methodNameResolver변수에 
+		  id속성값이 methodResolver인 PropertiesMethodNameResolver객체를 주입  
+	 
+	 2-2. MemberServiceImpl객체를  MemberControllerImpl객체의 memberService변수에 저장(주입)시킨다.
+	 
+	 3. /member/*.do 주소로 요청 했을때 어떤 컨트롤러를 호출할지 결정하는 SimpleUrlHandlerMapping 빈 생성 
+ -->
+
+
+	<!-- 디스팩처 서블릿으로 부터 전달 받은 뷰이름에 해당하는 뷰의 경로를 구해 주는 객체 생성 -->
+	<bean id="viewResolver"   
+		  class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		  
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix"  value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+	
+	</bean>
+	
+	
+	<bean id="userUrlMapping"
+		  class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		
+		<property name="mappings">
+			<props>
+				<prop key="/member/*.do">memberController</prop>
+			</props>
+		</property>
+	
+	</bean>
+	
+	
+	<!-- 컨트롤러 역할을 하는 클래스인? MemberControllerImpl클래스에 대한 객체(빈) 생성!!! -->	
+	<bean id="memberController" class="com.spring.member.controller.MemberControllerImpl" >
+		
+		<!-- 1. MemberController객체에 methodNameResolver변수에 
+		        id속성값이 methodResolver인 PropertiesMethodNameResolver객체를 주입       -->
+		<property name="methodNameResolver">		
+			<ref local="methodResolver" />			
+		</property>
+		
+		<!-- 2. MemberServiceImpl객체를  MemberControllerImpl객체의 memberService변수에 저장(주입)시킨다.  --> 
+		<property name="memberService"  ref="memberService"/>
+	</bean>
+	
+
+	<!-- URL요청주소명에 대해 MemberControllerImpl객체의  동일한 이름의 메소드를 호출하도록 설정합니다. -->
+	<bean id="methodResolver" 
+	      class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver">
+		
+		 <property name="mappings">
+		 	<props>
+		 		<prop key="/member/listMembers.do">listMembers</prop>
+		 		<prop key="/member/addMember.do">addMember</prop>
+		 		<prop key="/member/memberForm.do">memberForm</prop>
+		 		<prop key="/member/memberDetail.do">memberDetail</prop>
+		 	</props>
+		 </property>
+	
+	</bean>
+	
+</beans>
+
+
+
+
+
+

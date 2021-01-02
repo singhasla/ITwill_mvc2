@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+
+	<!--
+		1.action-service.xml파일은   MemberServiceImpl클래스에 대한 객체(빈) 생성 하도록 설정   
+		2.데이터베이스 작업할 MemberDAOImpl클래스에 대한 객체를 MemberServiceImpl객체의 변수에 주입 설정
+	 -->
+
+	  <bean id="memberService" class="com.spring.member.service.MemberServiceImpl">
+	  	
+	  	<!-- setMemberDAO(MemberDAO  memberdao)메소드 호출시.. 
+	  		MemberDAOImpl객체를 전달 하여 memberDAO변수에 주입(저장) -->
+      	<property name="memberDAO" ref="memberDAO"/>
+   	  
+   	  </bean>
+	
+</beans>
+
+
+
+
+

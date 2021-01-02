@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+
+	<!-- 
+		action-dataSource.xml파일
+		
+		이 파일은 스프링프레임워크 환경에서 사용할 데이터베이스 연동 정보를 설정 합니다.
+		
+		1.먼저 jdbc.properties파일에서 데이터베이스 연결 정보를 가져온후 이연결정보를 이용해 스프링 프레임워크에서 제공해주는 
+		    커넥션풀 역할을 하는  SimpleDriverDataSource클래스로  id속성값이  dataSource인  <bean>을(객체를) 생성합니다.
+		
+		2. 1.번에서 생성한 SimpleDriverDataSource커넥션풀 객체를  MemberDAOImpl객체의 변수에 주입 !
+	 -->
+	 
+	<!-- jdbc.properties파일에서 데이터베이스 연결에 필요한 4가지 설정정보를 가져 오기 위해 파일의 경로를 설정 -->
+   <bean  id="propertyConfigurer"
+      class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" >
+      <property name="locations" >
+         <list>
+            <value>/WEB-INF/config/jdbc.properties</value>
+         </list>
+      </property>
+   </bean>
+	
+	<!-- 1. 커넥션풀 설정-->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+		<property name="driverClass" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+
+	<!-- 2. 1.번에서 생성한 SimpleDriverDataSource커넥션풀 객체를  MemberDAOImpl객체의 변수에 주입 ! -->
+	<bean  id="memberDAO"   class="com.spring.member.dao.MemberDAOImpl" >
+	      <property name="dataSource" ref="dataSource"  />
+	</bean> 
+
+</beans>
+
