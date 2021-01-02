@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+  
+
+ <configuration>
+ <!-- 
+	<typeAlias>태그는 애플리케이션에서 SQL문으로  값을 전달 하거나 마이바티스에서 DMBS로 SQL문 실행시 반환되는 레코드를
+	저장할 용도로 사용하기 위한 빈인 MemberVO빈을 생성 하는 태그이다.
+ -->
+ 	 <typeAliases>
+      <typeAlias type="com.spring.ex04.MemberVO" alias="memberVO"/>
+     </typeAliases>
+ 	
+<!-- <dataSource>커넥션풀 을 이용해 마이바티스가 연동하는 데이터베이스에 대한 데이터소스(커넥션풀) 설정 코드 --> 		
+ 	<environments default="development">
+     <environment id="development">
+        <transactionManager type="JDBC"/>
+        <dataSource  type="POOLED">
+            <property name="driver"  value="oracle.jdbc.driver.OracleDriver" />
+            <property  name="url"    value="JDBC:oracle:thin:@localhost:1521:XE" />
+            <property name="username" value="scott" />
+            <property name="password"  value="tiger"/>        
+        </dataSource>
+     </environment>
+   </environments>
+
+<!-- 회원 기능 관련 SQL문이 존재 하는 member.xml을 읽어 들입니다. 이때 반드시 지정한 패키지 이름과 일치해야 한다는 점 주의 -->
+	<mappers>
+	   <mapper resource="mybatis/mappers/member.xml"/>
+	</mappers>
+
+ </configuration>

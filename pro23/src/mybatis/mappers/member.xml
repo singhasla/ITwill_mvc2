@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+  
+<!-- member.xml의 네임스페이스를 지정합니다 -->  
+<mapper  namespace="mapper.member">
+
+	<!-- SQL문을 실행한후 반환되는 레코드들을 <typeAlias>태그에서 지정한 memberVO빈에 저장하는 부분 -->
+	
+	<resultMap id="memResult" type="memberVO">
+		
+	<!-- 레코드의 컬럼 이름에 대해 MemberVO의 같은 변수(속성)에 값을 설정(저장)하는 부분   -->
+		<result property="id" column="id" />
+        <result property="pwd" column="pwd" />
+        <result property="name" column="name" />
+        <result property="email" column="email" />
+        <result property="joinDate" column="joinDate" />
+
+	</resultMap>
+ 	
+
+	<!-- 조회한 레코드를 지정한 컬럼이름을 key, 값을 value로 해서 저장합니다.
+		 -> <resultMap>태그의 type속성에는 HashMap이 지정되어 있습니다
+		    즉, SQL문 실행시  조회된 레코드의 컬럼이름을 key로 지정하고, 조회된 값을 value로 해서 HashMpa에 차례대로 저장합니다. 
+	 -->
+	<!-- 
+	<resultMap id="memResult"  type="java.util.HashMap" >	
+		<result property="id" column="id" />
+        <result property="pwd" column="pwd" />
+        <result property="name" column="name" />
+        <result property="email" column="email" />
+        <result property="joinDate" column="joinDate" />
+	</resultMap>
+	 -->
+
+	<!-- <select>태그의 id속성은  MemberDAO에서 SQL문을 구분해서 호출하는 용도로 사용되며,   
+	     SELECT구문 실행후 조회된 결과 데이터를  id속성값이 memResult인 위 <resultMap>태그에 설정한  MembeVO객체의 각변수에 저장 을 설정
+	-->
+	<select id="selectAllMemberList" resultMap="memResult">
+      <![CDATA[
+         select * from t_member	order by joinDate desc	 	
+      ]]>
+	</select>
+	
+	<!-- 
+		<![CDATA[ ......]]> 태그 란?
+		-> SQL문의   > , < , <= , >= 같은 연산자들을 XML파일에서 작성하면 연산자가 아닌 특수문자로 인식하므로 오류가 발생합니다
+		   이러한 연산자들도 SQL문의 일부라는 것을 알려주기 위해  <![CDATA[ ....]]> 태그 안에 작성 해야 합니다
+	 -->
+
+
+	<!-- 
+		id속성값 : MemberDAO클래스 내부에서 아래의 select문장에 접근해서 사용할 SQL문의 id속성값을 지정합니다.
+		resultType속성값 : 문자열로 지정해 SQL문으로 조회한  이름(문자열)을 호출한 메소드로 반환합니다.
+	 -->
+
+	<select id="selectName"   resultType="String"  >
+	  <![CDATA[
+         select name from t_member where id = 'hong'		
+      ]]>
+	</select>   
+	
+	<select id="selectPwd" resultType="int" >
+		 <![CDATA[
+		   select pwd from t_member where id = 'hong'
+		 ]]>
+	</select>
+	
+	
+	<!--  id속성값은  MemberDAO클래스의 메소드 내부에서 호출하는 값이다.
+	
+		  #{id} 는  MemberDAO에서 메소드를 호출하면서  parameterType속성으로 전달된  값의 이름을 select문의  id의 조건값으로 사용합니다.
+		  
+		  resultType="memberVO" 는 조회된 한개의 회원정보를  MemberVO객체에 저장하기 위해 
+		  SqlMapConfig.xml에서 생성한   <typeAlias>태그의 alias="memberVO"값으로 MemberVO객체를 지정 합니다.
+	 -->
+	<select id="selectMemberById"  parameterType="String"  resultType="memberVO"     >
+		<![CDATA[
+			select * from t_member where id = #{id}
+		 ]]>
+	
+	</select>
+	
+	
+	<select id="selectMemberByPwd" parameterType="int" resultMap="memResult" >
+		<![CDATA[
+			select * from t_member
+			where pwd = #{pwd}
+		 ]]>
+	</select>
+	
+	
+	<!-- 
+		insert문은 <insert>태그를 이용해서 작성하고 
+		DB에 INSERT할 회원정보를 MemberVO객체의 각변수에 저장되어 있다.
+		그러므로 <insert>태그의 parameterType="memberVO"해서  MemberVO객체를 DAO로부터 전달 받았다
+		아래의 values(...)구문의  #{ }내부에 들어갈 값은  전달 받은 MemberVO객체의 각변수명을 적어 
+		변수에 저장된 우리가 입력한 값을 DB에 INSERT하게 된다.
+		
+		참고 :  values 다음에  #{MemberVO객체의 변수명}을 나열 해야 한다.
+	 -->
+	<insert id="insertMember" parameterType="memberVO" >
+		<![CDATA[
+			insert into t_member(id,pwd,name,email)
+			values(#{id},#{pwd},#{name},#{email})	
+		]]>
+	</insert>
+	
+	<!-- 참고 : 
+		 insert문의 parameterType을 HashMap으로 지정합니다.
+		 입력한 회원정보들은 HashMap에 key-value 한쌍씩 저장 되어 있기때문에
+		 #{key} -> key에 대응되는 입력한 value를 사용해서 DB에 insert하게 됨.
+	 -->
+	<insert id="insertMember2" parameterType="java.util.HashMap" >
+		<![CDATA[
+			insert into t_member(id,pwd,name,email)
+			values(#{id},#{pwd},#{name},#{email})	
+		]]>
+	</insert>
+	
+	
+	<!-- 
+		update문은 <update>태그를 이용해 작성하고,
+		parameterType속성은 MemberDAO에서 update메소드를 호출할떄 전달될  MemberVO클래스타입으로 지정합니다.
+		update문에서 수정할 컬럼 값들을  MemberVO객체의 각변수이름으로 지정하고 #{MemberVO객체의 변수이름} ,
+		수정할 회원ID에 해당하는 조건 값도 MemberVO객체의 id변수에 저장된 값으로 지정합니다.	
+	 -->
+	<update id="updateMember" parameterType="memberVO">
+		<![CDATA[
+			update t_member
+			set pwd=#{pwd}, name=#{name}, email=#{email}
+			where id=#{id}
+		]]>
+	</update>
+	
+	
+
+</mapper>
+
+
+

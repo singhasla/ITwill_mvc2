@@ -1,0 +1,79 @@
+기존의 JDBC의 문제점
+문제점1) connection => PreparedStatement객체 얻기 => SQL문을 DB에 전송
+	=> 조회된 결과를 ResultSet으로 반환 => 자원해제 close()과정으로 작업함
+문제점2) SQL 구문(select, insert, update, delete) 등이 자바코드와 섞여 있어
+	자바코드의 가독성을 떨어뜨린다.(코드가 복잡해서 사용 및 유지보수가 어려워짐)
+
+
+
+(MyBatis)마이바티스 프레임워크란?
+
+ - SQL문의 실행결과를 자바의 VO객체 또는 Map객체에 매핑해 주는 퍼시스턴스 프레임워크이다. (ORM 프레임워크의 종류)
+ - SQL문을 DAO자바파일이 아닌 XML파일에 따로 분리해서 관리해줄 수 있는 특징이 있다.
+ - 데이터소스(커넥션풀)기능과 트랜잭션 처리 기능을 제공해주는 프레임워크이다.
+ - 요약 : select문장을 xml파일에 작성해놓고 DAO.java파일에서 xml파일에 작성한 select문장을 불러와 
+	사용할 수 있게 해주는 프레임워크가? 마이바티스 프레임워크이다.
+
+
+마이바티스 프레임워크 설치(설명: 구글에서 '마이바티스 한글' 검색 또는 https://mybatis.org/mybatis-3/ko/index.html)
+1. http://www.mybatis.org에 접속한 후 Products탭 클릭(https://blog.mybatis.org/p/products.html)
+2. 다운로드 받은 mybatis.jar파일을 프로젝트에 복사
+
+
+마이바티스 프레임워크를 이용하여 회원기능 실습하기
+* 마이바티스 관련 설정 파일
+	설정파일					기능
+	
+	SqlMapConfig.xml		데이터베이스 연동시 반환되는 값을 저장할 VO, 커넥션풀(DataSource) 등
+							마이바티스 관련 정보를 설정합니다.
+	
+	member.xml				회원기능 관련한 insert, select, delete, update 쿼리구문을 작성해 놓는 파일
+
+
+1. 마이바티스(mybatis) 프레임워크를 이용하여 회원정보 CRUD(Create, Read, Update, Delete)실습
+* 마이바티스의 SqlSession클래스에서 제공하는 CRUD를 실행할 때 가장 많이 사용되는 메소드들
+	메소드								기능
+	
+	List selectList(query_id)			id속성값에 대한 select문을 실행한 후 여러 레코드를 List로 반환합니다.
+
+	List selectList(query_id, 조건값)		id속성값에 대한 select문을 실행하면서 사용되는 조건값도 전달하여 검색해 옵니다.
+										
+	T	selectOne(query_id, 조건값)		id속성값에 대한 select문을 실행하면서 사용되는 조건값도 전달하여 
+										하나의 레코드를 검색해 옵니다.
+										
+	Map<K,V> selectMap(query_id, 조건값)	id속성값에 대한 select문을 실행하면서 사용되는 조건값도 전달합니다.
+										Map타입으로 검색한 레코드들을 반환합니다.
+										
+	int	insert(query_id, Object obj)	id속성값에 대한 insert문을 실행하면서, obj객체의 값을 테이블에 추가합니다.
+	
+	int	update(query_id, Object obj)	obj객체의 값을 조건문의 수정값으로 사용해, id속성값에 대한 update문을 실행합니다.
+	
+	int	delete(query_id, Object obj)	obj객체의 값을 조건문의 조건값으로 사용해, id속성값에 대한 delete문을 실행합니다.
+	
+	
+2. 회원의 ID와 비밀번호 조회
+	-> 테이블의 회원정보 중 문자열이나 정수와 같은 기본형 데이터를 조회해보자.
+	
+	요청 : http://localhost:8080/mem2.do로 서블릿을 요청
+		  서블릿에서 selectName()메소드로 조회한 경우	-> 아이디에 해당하는 회원이름을 알림창으로 출력
+		  서블릿에서 selectPwd()메소드로 조회한 경우	-> 아이디에 해당하는 비밀번호를 알림창으로 출력
+		  
+		  
+3. 모든 회원정보를 조회해서 조회한 정보를 key-value형태로 HashMap공간에 담아 반환하자.
+
+4. 조건값으로 회원정보 조회
+ - 검색창에서 검색 조건을 입력한 후 member.xml의 SQL문에 전달하여 조건에 대한 회원정보를 조회하는 예제.
+ 	[그림]					
+ 			입력 : ____________	|	<select>
+ 								|		<option>비밀번호</option>
+ 					[검색버튼]		|		<option>아이디</option>
+ 								|	</select>
+ 								
+5. 회원가입창에서 입력한 회원정보를 마이바티스를 이용해 DB에 등록해보자.
+	memberForm.jsp(회원가입창)에서 입력한 정보를 서블릿으로 전달하여 DB에 INSERT
+		
+6. test03/modMember.jsp 회원정보 수정 페이지에서 수정할 정보를 입력하고
+	ID가 admin인 회원정보를 수정하기 위해 수정하기 버튼 클릭시...
+	MemberServlet.class서블릿에게 수정 요청주소를 전달 하여 작업한다.
+	UPDATE!!!
+	
