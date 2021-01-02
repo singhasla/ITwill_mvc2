@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+
+	<!--
+	//SimpleUrlController컨트롤러 클래스에 대해 빈(객체) 생성
+	<bean id="simpleUrlController" class="com.spring.ex01.SimpleUrlController"/>	
+	
+
+	 스프링의 SimpleUrlHandleMapping클래스에 대한 빈(객체)을 생성하면 
+	 요청주소인? /test/index.do에 대해  처리하는 컨트롤러를 SimpleUrlController로 설정 합니다. 
+	<bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">		
+		<property name="mappings">
+			<props>
+				<prop key="/test/index.do">simpleUrlController</prop>
+			</props>
+		</property>
+	</bean>
+	참고 : xml설정 파일이름은 반드시 web.xml의 서블릿 매핑시 사용했던 <servlet-name>태그의 값인 action으로 시작 해야 합니다.
+		  pro21프로젝트에서는 web.xml에서 태그값을 action으로 설정했으므로  action1-servlet.xml로 잘못 지정하면
+		   톰캣 실행시 오류가 발생합니다.
+	 -->
+	
+	<!-- UserController컨트롤러에서 ModelAndView인자로 뷰 이름이 반환되면
+		 InternalResourceViewResolver객체의 prefix속성에 지정된  /test폴더에서 ModelAndView인자로 넘어온
+		 뷰 이름에 해당되는 JSP를 선택해 DispatcherServlet으로 보냅니다.
+		 
+		 요약 : UserController컨트롤러 내부에 ModelAndView객체에 이동할 뷰 페이지의 이름을 저장한 뒤
+				뷰 이름을 InternalResourceViewResolver가 받아 뷰의 경로를 만든 뒤
+				DispatcherServlet으로 뷰 전체 경로를 전달한다. 
+	-->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+		<property name="prefix" value="/test/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>	
+	<!-- 뷰이름 memberInfo을 전달 받아 ....  /test/memberInfo.jsp 뷰의 경로를 만들어서 디스팩처서블릿으로 전체 주소 반환후 이동  -->
+	
+	<!--뷰이름중.. 확장자명 .jsp를 제외한  뷰이름을 받아...	=> 뷰로 찾아갈 경로를 만듬 	/test/result.jsp  -->
+	
+	
+	<!-- URL요청멍이 /test/*.do로 시작되면 UserController컨트롤러 클래스를 요청하도록 설정 -->
+	<bean id="userUrlMapping" 
+		  class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="mappings">
+			<props>
+				<prop key="/test/*.do">userController</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<!-- methodNameResolver프로퍼티에 userMethodNameResolver를 주입해서 
+		 지정한 요청명에 대해서 직접 메소드를 호출하게 합니다. -->
+	<bean id="userController" class="com.spring.ex02.UserController">
+		<property name="methodNameResolver">
+			<ref local="userMethodNameResolver"/>
+		</property>
+	</bean>
+	
+	
+	<!-- PropertiesMethodNameResolver를 이용해 /test/login.do로 요청하면 
+		 UserController컨트롤러 클래스의 login메소드를 호출합니다. -->
+	<bean id="userMethodNameResolver" 
+		  class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver">
+		<property name="mappings">
+			<props>
+				<!-- 요청 주소(URL)에 대해서 호출될 UserController의 메소드명 작성 -->
+				<prop key="/test/login.do">login</prop>
+		 		<prop key="/test/loginForm.do">loginForm</prop>
+		 		<prop key="/test/memberInfo.do">memberInfo</prop>
+		 		<prop key="/test/memberForm.do">memberForm</prop>
+		 		
+			</props>
+		</property>
+	</bean>
+</beans>
+
+
+<!-- 
+		MultiActionController클래스와 PropertiesMethodNameResolver클래스를 이용한 메소드 이름 설정 방법
+		
+		
+			요청주소						호출되는 메소드명
+
+			/test/login.do				login()
+			
+			/test/memberInfo.do			memberInfo()
+										
+ -->
+
+
+
+
+
+
+
