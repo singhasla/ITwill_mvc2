@@ -136,7 +136,57 @@
 	</update>
 	
 	
+	<!-- 
+		
+	 -->
+	<delete id="deleteMember" parameterType="String">
+		<![CDATA[
+			delete from t_member
+			where id=#{id}
+		]]>
+	</delete>
 
+
+	<select id="searchMember"  parameterType="memberVO" resultMap="memResult">
+		<![CDATA[
+			select * from t_member
+		 ]]>
+		 <where>
+		 	<if test="name != '' and name != null">
+		 		name = #{name}
+			</if>
+			<if test="email != '' and email != null">
+				email = #{email}
+			</if>
+		 </where>
+		ORDER BY joinDate desc	
+	</select>
+	
+
+	<select id="searchMember2"  parameterType="memberVO" resultMap="memResult">
+		<![CDATA[
+			select * from t_member
+		 ]]>
+		 <where>
+		 	<choose>
+		 		<!-- 이름과 이메일을 모두 입력해서 조회하는 경우 where절 뒤에 추가될 SQL문 작성 -->
+		 		<when test="name != '' and name != null and email != '' and email != null">
+		 			name = #{name} and email = #{email}
+		 		</when>
+		 		<!-- 이름만 입력했을 경우 -->
+		 		<when test="name != '' and name != null">
+		 			name = #{name}
+		 		</when>
+		 		<!-- 이메일만  입력했을 경우 -->
+		 		<when test="email != '' and email != null">
+		 			email = #{email}
+		 		</when>
+		 	</choose>
+		 </where>
+		ORDER BY joinDate desc	
+	</select>
+	
+	
 </mapper>
 
 

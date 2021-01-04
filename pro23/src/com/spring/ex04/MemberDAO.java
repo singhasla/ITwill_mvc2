@@ -38,6 +38,41 @@ public class MemberDAO {
 		}
 		return sqlMapper;		
 	}//getInstance()
+
+
+	//서블릿에서 전달된 입력한 이름과 이메일은 MemberVO객체에 저장되어 있으므로 매개변수로 전달받아 사용
+	public List searchMember(MemberVO memberVO) {
+		//SqMapper객체 얻기
+		sqlMapper = getInstance();
+		
+		//SqlMapper객체의 openSession()메소드를 호출해 SqlSession객체 얻기
+		SqlSession session = sqlMapper.openSession();
+
+		//회원검색창에서 입력한 이름과 이메일이 저장된 MemberVO객체를 member.xml에 전달하여
+		//SELECT문 완성후 조회한 회원정보들을 List배열에 담아 반환받기
+		List list = session.selectList("mapper.member.searchMember2", memberVO);
+		
+		return list;
+	}
+	
+	
+	public int deleteMember(String id) {
+		//SqMapper객체 얻기
+		sqlMapper = getInstance();
+		
+		//SqlMapper객체의 openSession()메소드를 호출해 SqlSession객체 얻기
+		SqlSession session = sqlMapper.openSession();
+
+		int result = 0;
+		
+		//SqlSession객체의 delete()메소드를 이용해 delete문을 실행하고
+		//전달된 ID를 delete()메소드를 호출하면서 delete문장으로 전달함
+		result = session.delete("mapper.member.deleteMember", id);
+		
+		session.commit(); //delete쿼리 실행 후 수동반영
+		
+		return result; //성공시 1, 실패시 0
+	}
 	
 	
 	public int insertMember2(Map<String, String>  membersMap){
@@ -55,6 +90,7 @@ public class MemberDAO {
 		
 	}
 	
+	
 	public int insertMember(MemberVO memberVO){
 		
 		//SqMapper객체 얻기
@@ -70,8 +106,6 @@ public class MemberDAO {
 		return result;//DB에 회원추가에 성공했을때 1을 반환, 실패 했을떄 0을 반환 ->서블릿으로....
 		
 	}
-	
-	
 	
 	
 	//입력한 비밀번호를 매개변수로 전달 받아  비밀번호에 해당되는 모든 회원정보들을 조회 하는 메소드
@@ -96,7 +130,6 @@ public class MemberDAO {
 	}
 	
 	
-	
 	//입력한 id를  매개변수로 얻어  id에 해당되는 회원 조회 하는 메소드 
 	public MemberVO selectMemberById(String  id){
 		
@@ -115,9 +148,7 @@ public class MemberDAO {
 
 		return memberVO;//서블릿으로 조회한 한사람의 회원정보가 저장된 MemberVO객체(Model)를 리턴 
 	}
-	
-	
-	
+
 	
 	public int selectPwd(){
 		//SqMapper객체 얻기
@@ -129,7 +160,6 @@ public class MemberDAO {
 		//서블릿으로 조회된 회원비밀번호 리턴
 		return pwd;
 	}
-	
 	
 	
 	//MemberServlet서블릿으로 부터 호출 당하는 메소드로 
@@ -149,7 +179,6 @@ public class MemberDAO {
 		
 		return name;//DB로 부터 조회된 회원이름을 서블릿으로 반환
 	}
-	
 	
 	
 	//DB로 부터 모든 회원정보를 검색 하는 메소드
@@ -177,7 +206,6 @@ public class MemberDAO {
 		return memList;
 	}
 
-
 	
 	public int updateMember(MemberVO memberVO) {
 	
@@ -195,7 +223,6 @@ public class MemberDAO {
 		
 		return result;
 	}
-	
 
 }
 

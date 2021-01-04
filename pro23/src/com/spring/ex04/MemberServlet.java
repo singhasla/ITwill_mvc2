@@ -51,11 +51,12 @@ public class MemberServlet extends HttpServlet {
 		// /mem4.do?action=insertMember
 		//2-1. DB에 회원가입 성공후 요청받는 주소얻기  
 		// /mem4.do?action=listMembers
-		//3.입력한 회원정보를  DB에 INSERT하기 위해 요청한 주소값 얻기 
-		// /mem4.do?action=insertMember2
-		
-		//4.test03폴더 내부에 있는 modMember.jsp(회원수정창)에서 입력한 수정정보를 전달 받아 처리 하는 서블릿
+		//3. 입력한 회원정보를  DB에 INSERT하기 위해 요청한 주소값 얻기 
+		// /mem4.do?action=insertMember2		
+		//4. test03폴더 내부에 있는 modMember.jsp(회원수정창)에서 입력한 수정정보를 전달 받아 처리 하는 서블릿
 		//수정요청 주소 :  http://localhost:8080/pro23/mem4.do?action=updateMember
+		//5. listMembers.jsp에서 입력한 삭제정보를 전달 받아 처리 하는 서블릿
+		//삭제요청 주소 :  http://localhost:8080/pro23/mem4.do?action=deleteMember&id=....
 		String action = request.getParameter("action");
 		
 		//뷰페이지 경로 저장할 변수 
@@ -178,8 +179,42 @@ public class MemberServlet extends HttpServlet {
 			//UPDATE에 성공하면 다시 모든 회원정보들을 조회해서 listMembers.jsp에 출력해 주기위해
 			//모든 회원정보 조회 요청 주소를 nextPage변수에 저장 
 			nextPage = "/mem4.do?action=listMembers";
+		
+		//회원 검색 요청 주소를 받았을떄	
+		}else if(action.equals("searchMember")){
 			
-		}
+			//검색창에서 입력한 이름과 이메일을 request에서 꺼내와서
+			String name  = request.getParameter("name");
+			String email  = request.getParameter("email");
+			
+			//MemberVO에 저장
+			memberVO.setName(name);
+			memberVO.setEmail(email);
+
+			//조회한 회원정보를 List에 담아 반환
+			List membersList = dao.searchMember(memberVO);
+
+			//조회한 회원정보를 request메모리에 저장
+			request.setAttribute("membersList", membersList);
+			
+			//회원 조회 요청 주소를 nextPage변수에 저장 
+			nextPage = "test03/listMembers.jsp";
+			
+			//회원 삭제 요청 주소를 받았을떄	
+			}else if(action.equals("deleteMember")){
+				
+				//삭제하기 위해 입력한 회원정보들을 request에서 꺼내와서
+				String id  = request.getParameter("id");
+				
+				//회원목록창에서 전달된 삭제할 회원 ID를 DAO의 deleteMember()메소드를  호출시
+				//인자로 전달하여 삭제 작업 명령함
+				dao.deleteMember(id);
+				
+				//DELETE에 성공하면 다시 모든 회원정보들을 조회해서 listMembers.jsp에 출력해 주기위해
+				//모든 회원정보 조회 요청 주소를 nextPage변수에 저장 
+				nextPage = "/mem4.do?action=listMembers";
+				
+			}
 		
 		//디스패처 방식으로 View로 포워딩시  request객체 영역 전달
 		RequestDispatcher dispatch = request.getRequestDispatcher(nextPage);

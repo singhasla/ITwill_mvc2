@@ -3,13 +3,11 @@
     
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core"  prefix="c" %>    
   
-
 <c:set  var="contextPath"  value="${pageContext.request.contextPath}" />  
   
 <%
 	request.setCharacterEncoding("UTF-8");
 %>  
-    
     
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -26,6 +24,7 @@
   		<td><b>이름</b></td>
   		<td><b>이메일</b></td>
   		<td><b>가입일</b></td>
+  		<td><b>삭제</b></td>
   	</tr>
 <c:forEach var="member" items="${requestScope.membersList}">
 	<tr align="center">
@@ -34,6 +33,8 @@
 		<td>${member.name}</td>
 		<td>${member.email}</td>
 		<td>${member.joinDate}</td>
+		<!-- listMember.jsp페이지에서 삭제하기 링크를 클릭했을때 action값과 삭제할 회원 id를 서블릿으로 전송합니다. -->
+		<td><a href="${contextPath}/mem4.do?action=deleteMember&id=${member.id}">삭제하기</a></td>
 	</tr>
 </c:forEach>  	  
   </table>
