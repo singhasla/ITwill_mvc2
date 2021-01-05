@@ -2,6 +2,7 @@ package com.spring.ex04;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,9 @@ import javax.servlet.http.HttpServletResponse;
 
 //test03폴더 내부에 있는 modMember.jsp(회원수정창)에서 입력한 수정정보를 전달 받아 처리 하는 서블릿
 //수정요청 주소 :  http://localhost:8080/pro23/mem4.do?action=updateMember
+
+//http://localhost:8080/pro23/mem4.do?action=foreachSelect로 사람 모두 검색요청!
+
 
 @WebServlet("/mem4.do")
 public class MemberServlet extends HttpServlet {
@@ -214,7 +218,29 @@ public class MemberServlet extends HttpServlet {
 				//모든 회원정보 조회 요청 주소를 nextPage변수에 저장 
 				nextPage = "/mem4.do?action=listMembers";
 				
+			//회원이름이 홍길동, 이순신, 김유신인 사람의 조회 요청을 받았을떄	
+			}else if(action.equals("foreachSelect")){
+				
+				//ArrayList에 검색할 이름을 저장한 후 SQL문(SELECT)문을 만들기위해 ArrayList배열 전달
+				List<String> nameList = new ArrayList<String>();
+				
+				nameList.add("홍길동");
+				nameList.add("이순신");
+				nameList.add("김유신");
+				
+				//dao의 foreachSelect메소드 호출시 ArrayList배열 전달
+				List membersList = dao.foreachSelect(nameList);
+				
+				//조회된 회원정보들(ArrayList)을 View페이지(listMembers.jsp)에 출력해 주기위해
+				//임시로 request객체영역에 ArrayList배열을 추가해서 저장
+				request.setAttribute("membersList", membersList);
+				
+				//모든 회원정보 조회 요청 주소를 nextPage변수에 저장 
+				nextPage = "test03/listMembers.jsp";
+				
 			}
+		
+		
 		
 		//디스패처 방식으로 View로 포워딩시  request객체 영역 전달
 		RequestDispatcher dispatch = request.getRequestDispatcher(nextPage);

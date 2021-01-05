@@ -108,13 +108,17 @@
 
 - if
 - choose(when, otherwise)
-- trim(where, set)
 - foreach
+- trim(where, set)
+
 
 마이바티스의 동적 SQL문의 특징
 - sql문의 조건절에서 사용합니다.
 - 조건절(where)에 조건을 동적으로 추가합니다.
 - JSTL과 XML기반으로 동적SQL문을 작성합니다.
+
+
+-------
 
 		<if>태그로 동적 SQL문 만들기
 		- 동적 SQL문을 작성할 때 각 조건에 대해 동적으로 SQL문에 조건식을 추가해주는 <if>태그
@@ -123,12 +127,13 @@
 			반대로 조건식이 없으면 추가하지 않습니다.
 		- <if>태그는 JSTL의 <c:if>코어 태그의 사용법과 같습니다.
 		
-			<if>태그 사용법
-				<where>
-					<if test='조건식'>
-							조건에 만족하면 추가할 SQL문을 작성
-					</if>
-				</where>
+		* <if>태그 사용법
+		
+			<where>
+				<if test='조건식'>
+						조건에 만족하면 추가할 SQL문을 작성
+				</if>
+			</where>
 				
 		실습순서
 		1. http://localhost:8080/pro23/test03/searchMember.jsp(회원검색 화면)에서..
@@ -179,17 +184,134 @@
 			 => SQL문을 작성해보면
 			 	select * from t_member
 			 	where email = 'hong@test.com'
-	 	
+
+
+-------	 	
 	 	
 		<choose>태그로 동적 SQL문 만들기
 		- <choose>태그는 SQL문에서 자바의 switch문과 같은 기능을 구현한다고 생각하면 됩니다.
 			이때 <otherwise>태그는 생략 할 수 있습니다.
 	
-		<choose> 태그 사용법
+		* <choose>태그 사용법
+		
 		   <choose>
 		      <when test="조건식1"> 조건식1에 만족하면 추가할 SQL문장 </when>
 		      <when test="조건식2"> 조건식2에 만족하면 추가할 SQL문장 </when>
 		      <when test="조건식3"> 조건식3에 만족하면 추가할 SQL문장 </when>
 		      <otherwise> 조건식1, 조건식2, 조건식3에 만족하지 않으면 추가될 SQL문장 </otherwise>
 		   </choose>
+		   
+-------		   
+		
+		<foreach>태그로 회원정보 조회하기
+		- <foreach>를 이용하면 SQL문에서 한번에 여러개의 데이터를 처리할 수 있습니다.
+	
+		* <foreach>태그 사용법
+		
+		   <foreach item="반복문이 실행될 때마다 collection속성에 지정된 배열의 각 인덱스 위치에 저장된 값을 차례대로 사용" 
+		   			collection="배열" 
+		   			index="foreach반복문이 반복 실행될때마다 1씩 증가시키면서 접근하는 값의 위치를 나타낸다, 최초위치 0" 
+		   			open="해당 구문이 시작될 때의 지정한 시작 기호를 추가함" 
+		   			close="해당 구문이 끝날 때의 지정한 끝 기호를 추가함" 
+		   			separator="한 번 이상 반복될때 반복되는 사이에 지정한 기호를 추가함" >
 				
+				#{item}
+		   
+		   </foreach>
+				
+		실습순서
+		1. http://localhost:8080/pro23/mem4.do?atcion=foreachSelect로  
+			이름이 홍길동, 이순신 , 차범근 인 사람을 모두 검색 요청!
+
+		2. select * from t_member
+			where name in('홍길동','이순신','차범근')
+
+-------		   
+		
+		<foreach>태그로 여러명의 회원정보를 한꺼번에 insert하기
+		- MySQL과 달리 오라클에서는 insert문을 동시에 여러 개 사용하면 오류가 발생한다.
+			따라서 오라클에서는 <foreach>태그의 open속성과 close속성의 값으로 SQL문을 설정한 후
+			서브쿼리 형식으로 다중 insert문을 구현한다.
+			이처럼 <foreach>태그를 사용하면 여러 정보를 한꺼번에 테이블에 추가할 수 있다.
+	
+		* <foreach> insert 작성법
+		
+			[잘못된 예]
+			member.xml
+			
+			<insert id="foreachInsert"  parameterType="java.util.Map">
+			
+				INSERT INTO t_member(id, pwd, name, email)
+				VALUES
+			
+				<foreach item="item" collection="list">
+				    (#{item.id},
+				     #{item.pwd},
+				     #{item.name},
+				     #{item.email})		
+				</foreach>
+			
+			</insert>
+			
+			
+			[잘 작성된 예]
+			member.xml
+			
+			<insert id="foreachInsert"  parameterType="java.util.Map">
+			
+				<foreach item="item" 
+						collection="list"  
+						open="INSERT ALL" separator=" "  
+						close="SELECT * FROM DUAL" >
+			
+					INTO t_member(id, pwd, name, email)
+					VALUES (#{item.id}, 
+							#{item.pwd}, 
+							#{item.name}, 
+							#{item.email})
+
+				</foreach>
+			
+			</insert>
+			
+-------	
+
+		<sql>태그와 <include>태그로 SQL문 중복 제거하기
+		- 마이바티스에서는 <sql>태그를 제공하여 member.xml에서 SQL문을 재사용할 수 있게 해줍니다.
+		
+		member.xml을 열어서 작성!
+		
+-------
+
+		마이바티스에서 오라클 연동해 like 검색하는 방법
+		
+			[잘못된 예]
+			member.xml
+		
+			<select>
+			   <![CDATA[
+				select * from t_member
+				where name like '%'#{name}'%'  <---이렇게 작성하면 실행시 오류 발생 함
+			   ]]>
+			</select>
+
+
+			[잘된 예]
+			
+			<select>
+			   <![CDATA[
+				select * from t_member
+				where name like '%' || #{name} || '%'  <--- #{name}앞에는 '%' ||를 붙입니다. 
+															그리고 뒤에는 || '%'를 붙입니다.
+			   ]]>
+			</select>
+
+
+-----------------------------------------------------------------------------------------
+마이바티스 참고 문서 
+https://mybatis.org/mybatis-3/ko/index.html
+
+
+
+
+		      

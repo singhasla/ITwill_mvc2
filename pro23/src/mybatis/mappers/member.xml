@@ -40,7 +40,8 @@
 	-->
 	<select id="selectAllMemberList" resultMap="memResult">
       <![CDATA[
-         select * from t_member	order by joinDate desc	 	
+         select * from t_member	
+         order by joinDate desc	 	
       ]]>
 	</select>
 	
@@ -58,13 +59,15 @@
 
 	<select id="selectName"   resultType="String"  >
 	  <![CDATA[
-         select name from t_member where id = 'hong'		
+         select name from t_member 
+         where id = 'hong'		
       ]]>
 	</select>   
 	
 	<select id="selectPwd" resultType="int" >
 		 <![CDATA[
-		   select pwd from t_member where id = 'hong'
+		   select pwd from t_member 
+		   where id = 'hong'
 		 ]]>
 	</select>
 	
@@ -78,7 +81,8 @@
 	 -->
 	<select id="selectMemberById"  parameterType="String"  resultType="memberVO"     >
 		<![CDATA[
-			select * from t_member where id = #{id}
+			select * from t_member
+			where id = #{id}
 		 ]]>
 	
 	</select>
@@ -136,9 +140,6 @@
 	</update>
 	
 	
-	<!-- 
-		
-	 -->
 	<delete id="deleteMember" parameterType="String">
 		<![CDATA[
 			delete from t_member
@@ -147,10 +148,16 @@
 	</delete>
 
 
-	<select id="searchMember"  parameterType="memberVO" resultMap="memResult">
+<!-- <sql>태그를 이용해 공통 SQL문을 작성해 놓자 -->
+	<sql id="a">
 		<![CDATA[
 			select * from t_member
 		 ]]>
+	</sql>
+
+
+	<select id="searchMember"  parameterType="memberVO" resultMap="memResult">
+		<include refid="a"/>
 		 <where>
 		 	<if test="name != '' and name != null">
 		 		name = #{name}
@@ -164,9 +171,7 @@
 	
 
 	<select id="searchMember2"  parameterType="memberVO" resultMap="memResult">
-		<![CDATA[
-			select * from t_member
-		 ]]>
+		<include refid="a"/>
 		 <where>
 		 	<choose>
 		 		<!-- 이름과 이메일을 모두 입력해서 조회하는 경우 where절 뒤에 추가될 SQL문 작성 -->
@@ -187,6 +192,14 @@
 	</select>
 	
 	
+	<select id="foreachSelect"  parameterType="java.util.List" resultMap="memResult">
+		<include refid="a"/>
+		 where name in
+		 <foreach open="(" separator="," close=")" item="item" collection="list">
+		 	#{item}
+		 </foreach>
+		ORDER BY joinDate desc
+	</select>
 </mapper>
 
 

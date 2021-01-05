@@ -39,6 +39,21 @@ public class MemberDAO {
 		return sqlMapper;		
 	}//getInstance()
 
+	
+	//
+	public List foreachSelect(List<String> nameList) {
+		//SqMapper객체 얻기
+		sqlMapper = getInstance();
+		
+		//SqlMapper객체의 openSession()메소드를 호출해 SqlSession객체 얻기
+		SqlSession session = sqlMapper.openSession();
+
+		//SELECT문 완성후 조회한 회원정보들을 List배열에 담아 반환받기
+		List list = session.selectList("mapper.member.foreachSelect", nameList);
+
+		return list;
+	}
+
 
 	//서블릿에서 전달된 입력한 이름과 이메일은 MemberVO객체에 저장되어 있으므로 매개변수로 전달받아 사용
 	public List searchMember(MemberVO memberVO) {
