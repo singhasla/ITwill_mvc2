@@ -5,7 +5,7 @@
    
   
 <!-- member.xml의 네임스페이스를 지정합니다 -->  
-<mapper  namespace="mapper.member">
+<mapper namespace="mapper.member">
 
 	<!-- SQL문을 실행한후 반환되는 레코드들을 <typeAlias>태그에서 지정한 memberVO빈에 저장하는 부분 -->
 	
