@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration 	PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+	<!-- modelConfig.xml에서는 <typeAlias>태그를 이용해 
+		매퍼파일에서 긴 이름의 클래스를 별칭으로 사용할 수 있게 설정함 -->
+	<configuration>
+		<typeAliases>
+			<typeAlias type="com.spring.member.vo.MemberVO" alias="memberVO"/>
+		</typeAliases>
+	</configuration>

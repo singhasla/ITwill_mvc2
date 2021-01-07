@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+ xsi:schemaLocation="http://www.springframework.org/schema/beans
+ http://www.springframework.org/schema/beans/spring-beans.xsd
+ http://www.springframework.org/schema/context
+ http://www.springframework.org/schema/context/spring-context.xsd
+ http://www.springframework.org/schema/tx
+ http://www.springframework.org/schema/tx/spring-tx-3.0.xsd"
+ xmlns:tx="http://www.springframework.org/schema/tx" 
+ xmlns:context="http://www.springframework.org/schema/context"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+ xmlns="http://www.springframework.org/schema/beans">
+
+	<!-- 
+		pro23프로젝트에서 사용된 sqlMapConfig.xml파일을 대체합니다. 
+		스프링에서 마이바티스 관련 클래스들을 설정파일에서 설정하여 객체(빈)들을 자동으로 생성합니다.
+		action-mybatis.xml에서는 스프링의 SqlSessionFactoryBean클래스에 대한 객체(빈)을 생성하면서
+		매퍼파일인 member.xml과 객채(빈) 설정파일인 modelConfig.xml을 읽어들입니다.
+		또한 스프링의 sqlSession빈을 생성하면서 SqlSessionFactoryBean객체를 주입하고
+		다시 memberDAO객체(빈)을 생성하면서 sqlSession객체(빈)을 주입합니다.
+	-->
+	
+		<!-- PropertyPlaceholderConfigurer클래스를 이용해 
+			데이터베이스 설정정보를 jdbc.properties파일에서 읽어옵니다. -->
+		<bean id="propertyPlaceholderConfigurer" 
+			  class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+			<property name="locations">
+				<value>/WEB-INF/config/jdbc.properties</value>
+			</property>
+		</bean>
+		
+		<!-- 마이바티스에서 제공하는 PooledDataSource클래스를 이용해 커넥션풀(dataSource)객체(빈)을 생성합니다. -->
+		<bean id="dataSource" class="org.apache.ibatis.datasource.pooled.PooledDataSource">
+			<property name="driver" value="${jdbc.driverClassName}"/>
+			<property name="url" 	value="${jdbc.url}"/>
+			<property name="username" value="${jdbc.username}"/>
+			<property name="password" value="${jdbc.password}"/>
+		</bean>
+		
+		<!-- Mybatis프레임워크에서 제공하는 SqlSessionFactoryBean클래스를 이용해 객체 생성시, 
+			위 PooledDataSource(커넥션풀)을 주입시킵니다. -->
+		<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+			<property name="dataSource" ref="dataSource"/>
+			<!-- configLocation속성에 modelConfig.xml의 경로를 설정 -->
+			<property name="configLocation" value="classpath:mybatis/model/modelConfig.xml"/>
+			<!-- mapperLocations속성에 mybatis/mappers패키지의 모든 매퍼파일들을 읽어들일 설정 -->
+			<property name="mapperLocations" value="classpath:mybatis/mappers/*.xml"/>
+		</bean>
+		
+		<!-- Mybatis-spring프레임워크에서 제공하는 SqlSessionTemplate클래스를 이용해 객체 생성시, 
+			위 SqlSessionFactoryBean객체를 주입시킵니다. -->
+		<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+			<constructor-arg index="0" ref="sqlSessionFactory"></constructor-arg>
+		</bean>
+		
+		<!-- MemberDAOImpl객체 생성시.. 위 SqlSessionTemplate객체를 
+			MemberDAOImpl의 sqlSession속성에 주입시킵니다. -->
+		<bean id="memberDAO" class="com.spring.member.dao.MemberDAOImpl">
+			<property name="sqlSession" ref="sqlSessionTemplate"></property>
+		</bean>
+</beans>
