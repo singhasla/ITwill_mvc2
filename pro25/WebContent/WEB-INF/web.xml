@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>pro24</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  
+  <!-- 톰캣이 웹프로젝트 실행시.. 여러 xml설정파일들을 /WEB-INF/config폴더에서 읽어들이도록 설정 -->
+  <listener>
+  	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  <context-param>
+  	<param-name>contextConfigLocation</param-name>
+  	<param-value>
+  		/WEB-INF/config/action-myBatis.xml 
+  		/WEB-INF/config/action-service.xml
+  	</param-value>
+  </context-param>
+  
+  
+  
+  <!-- 클라이언트가 웹브라우저 주소창에 주소를 입력해서 처음으로 요청하는 디스팩처 서블릿 설정 -->
+  <servlet>
+  		<servlet-name>action</servlet-name>
+  		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+  	
+  </servlet>
+  <servlet-mapping>
+  		<servlet-name>action</servlet-name>
+  		<url-pattern>*.do</url-pattern>
+  </servlet-mapping>
+  
+  
+  
+</web-app>
+
+
+

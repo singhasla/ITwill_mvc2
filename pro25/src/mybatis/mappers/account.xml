@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+
+<mapper namespace="mapper.account">
+	
+	<!-- 두개의 update문으로 구명의 계좌 잔고를 갱신합니다. -->
+	
+	<!-- 홍길동이 김유신에게 5000000원을 계좌이체 함으로써 잔고를 5000000원 감액합니다.  -->
+	<update id="updateBalance1">
+		<![CDATA[ 
+			update cust_account
+			set balance=balance-5000000
+			where accountNo = '70-490-930'
+		]]>
+	
+	</update>
+
+	<!--김유신은 홍길동으로부터 5000000원을 이체 받았으므로  잔고를 5000000원 증액합니다. -->
+	<update id="updateBalance2">
+		<![CDATA[ 
+			update cust_account
+			set balance=balance+5000000
+			where accountNo = 70-490-911
+		]]>
+	</update>
+
+</mapper>   
+    
+

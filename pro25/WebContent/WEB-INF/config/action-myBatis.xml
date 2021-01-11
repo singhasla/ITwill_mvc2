@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+ xsi:schemaLocation="http://www.springframework.org/schema/beans 
+ 					 http://www.springframework.org/schema/beans/spring-beans.xsd 
+ 					 http://www.springframework.org/schema/context 
+ 					 http://www.springframework.org/schema/context/spring-context.xsd 
+ 					 http://www.springframework.org/schema/tx 
+ 					 http://www.springframework.org/schema/tx/spring-tx-3.0.xsd"
+ xmlns:tx="http://www.springframework.org/schema/tx" 
+ xmlns:context="http://www.springframework.org/schema/context"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+ xmlns="http://www.springframework.org/schema/beans"> 
+ 
+ 
+    <!-- PropertyPlaceholderConfigurer클래스를 이용해 데이터베이스 설정 관련정보를 jdbc.properties파일에서 읽어들입니다. -->
+	<bean id="propertyPlaceholderConfigurer" 
+	      class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	
+		 <property name="locations">
+		 	<value>/WEB-INF/config/jdbc.properties</value>
+		 </property>
+	</bean>
+	
+	<!-- 마이바티스에서 제공하는  PooledDataSource클래스를 이용해  커넥션풀(dataSource)객체(빈)을 생성합니다. -->
+	<bean id="dataSource" class="org.apache.ibatis.datasource.pooled.PooledDataSource">
+		<property name="driver" value="${jdbc.driverClassName}"  />
+		<property name="url" value="${jdbc.url}"/>
+		<property name="username" value="${jdbc.username}"  />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+	
+	<!-- Mybatis프레임워크에서 제공해주는  SqlSessionFactoryBean클래스를 이용해  객체 생성시 .. 
+	         위  PooledDataSoruce(커넥션풀)을 주입시키자  -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		
+		<property name="dataSource"  ref="dataSource" />
+		    
+	    <!-- mapperLoactions속성에 mybatis/mappers패키지의 모든 매퍼파일들을 읽어들일 설정 -->
+	    <property name="mapperLocations" value="classpath:mybatis/mappers/*.xml"  />
+	</bean>
+	
+	<!-- Mybatis-spring프레임워크에서 제공해주는 SqlSessionTemplate클래스를 이용해서  객체를 생성시....
+		위  SqlSessionFactoryBean객체를 주입(저장) 시키자.
+	 -->
+	 <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+	 		<constructor-arg  index="0" ref="sqlSessionFactory"></constructor-arg>
+	 </bean>
+ 
+ 	<!-- AccountDAO객체 생성 시 setSqlSession메소드 호출시 SqlSessionTemplate객체를 전달하여 주입(저장)  -->
+ 	<bean id="accDAO" class="com.spring.account.AccountDAO">		
+ 			<property name="sqlSession" ref="sqlSession"  />	
+ 	</bean>
+ 
+ 	<!-- 스프링에서 제공해주는 DataSourceTransactionManager클래스를 이용해 트랜잭션 객체를 생성한후 
+ 		 dataSource속성에  PooledDataSource커넥션풀 객체를 주입하여 데이터베이스 연동시  트랜잭션기능을 적용합니다.
+ 		 그리고 txManager id속성값을 가진 DataSourceTransactionManager객체에 <tx:annotation-driven>태그를 설정해
+ 		 각클래스나 메소드에 어노테이션 기호를 작성해서 적용할수 있도록 합니다.
+ 	 -->
+ 	 
+ 	 <!-- DataSourceTransactionManager클래스를 이용해 객체(빈)생성후  PooledDataSource커넥션풀 객체를 주입 -->
+ 	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" >
+ 		<property name="dataSource"  ref="dataSource"/>	
+ 	</bean>
+ 	
+ 	
+ 	
+ 	<!-- 어노테이션 기호를 사용하여 트랜잭션을 적용하기 위해 DataSourceTransactionManager객체를 설정 합니다.  -->
+	<tx:annotation-driven  transaction-manager="txManager"/> 
+ 
+ 
+ </beans>
+
+ 
+ 
+ 
+ 
