@@ -1,0 +1,81 @@
+#스프링에서 제공 해  애너테이션 기호에 대해... (스프링 3.0버전 부터 도입된 기호)
+
+(설명) 
+스프링 2.5버전 까지는 DI 같은 기능은 따로 XML파일로 설정 한후 웹 애플리케이션 에서 사용 했습니다.
+그러나 웹 애플리케이션의 기능이 복잡해짐에 따라  XML설정 파일의 내용도 복잡해 졌고 관리에도 문제가 생기게 됩니다.
+
+따라서 스프링3.0버전 부터는 DI 같은 자바 코드와 관련된 설정은 직접  자바코드에서 할 수 있게 애너테이션 기호 기능을
+제공 합니다. 현재 현업 에서는 스프링 기반 웹 애플리케이션에서는 XML에서 설정하는 방법과 애너테이션 기호를 사용 하는 방법
+두 가지를 혼합해서 사용하고 있습니다.
+
+
+#스프링 애너테이션 기호로 제공되는 클래스 
+
+1. 입력한 요청 주소 처리에 관련한 애너테이션 기호 관련 클래스 종류
+DefaultAnnotationHandlerMapping	클래스 레벨에서 @RequestMapping어노테이션 기호의 기능을 처리함
+AnnotationMethodHandlerMapping	메소드 레벨에서 @RequestMapping어노테이션 기호의 기능을 처리함
+
+참고 : 위 2개의 클래스에 대한 객체(<bean>)을 설정 할 파일은 XML파일 이다.
+
+----------------------------------------------------------------------------------------------
+
+2. <context:componet-scan>태그 기능
+사용예)  <context:componet-scan base-package="패키지이름">
+
+이 태그를 사용해 패키지 이름을 지정하면 애플리케이션 실행시 해당 패키지에서 애너테이션 기호로 지정된 클래스에 대한
+빈(객체)를 생성 해 줍니다.
+
+참고 : 위 1개의 <context:componet-scan>태그를 설정 할 파일은 XML파일 이다.
+
+----------------------------------------------------------------------------------------------
+
+3. <context:componet-scan base-package="패키지이름.클래스이름"> 태그로 지정한 패키지 하위의 클래스명 위에
+  지정 하는 여러 가지 애너테이션 기호들의 종류
+
+  @Controller		스프링컨테이너(톰캣)가    
+                        <context:componet-scan base-package="패키지이름">태그로 지정한 패키지 하위의 클래스를 컨트롤러 역할을 하는 객체(<bean>)로 자동 변환함
+
+  @Service		스프링컨테이너(톰캣)가    
+                                        <context:componet-scan base-package="패키지이름">태그로 지정한 패키지 하위의 클래스를 서비스 역할을 하는 객체(<bean>)로 자동 변환함
+
+  @Repository		스프링컨테이너(톰캣)가    
+                                        <context:componet-scan base-package="패키지이름">태그로 지정한 패키지 하위의 클래스를 DAO 역할을 하는 객체(<bean>)로 자동 변환함
+
+  @Component		스프링컨테이너(톰캣)가    
+                                        <context:componet-scan base-package="패키지이름">태그로 지정한 패키지 하위의 클래스를 객체(<bean>)로 자동 변환함
+ 
+참고 : 위 4개의 애너테이션 기호를 설정 할 파일은 .java파일 이다.
+
+
+4. @Autowired 어노테이션 기호를 이용해 의존하는 객체(빈) 자동 주입 하기 
+
+action-servlert.xml파일에...
+객체(빈)을 생성한후  웹애플리케이션이 실행될때 객체(빈)을 다른 객체에 주입시켜 놓는 설정은 불편하다.
+이유 : xml <bean>태그에 대한 설정이 매우 복잡해 지면서 유지관리가 불편다하는 단점이 있다.
+
+예)
+<bean id="memberController" class="com.spring.member.controller.MemberControllerImpl">
+	<property name="memberService" ref="memberService"/>
+</bean>
+ 
+<bean id="memberService" class="com.spring.member.service.MemberServiceImpl">
+	<property name="memberDAO" ref="memberDAO"/>
+</bean>
+
+
+현재 스프링에서는  @Autowired를 이용해서 개발자가 만든 DAO,Service,Controller클래스들의 객체(빈)를
+직접 자바코드에서 생성하여 사용합니다.
+
+@Autowired기호를 사용하면 좋은 특징이 있다.
+1. 기존 XML파일에서 각각의 객체(빈)를 DI로 주입했던 기능을 자바코드에서 어노테이션 기호를 이용해 자동으로 
+   수행합니다.
+2. @Autowired를 사용하면 별도의 setter메소드나 생성자 없이 각클래스의 변수에 객체(빈)를 주입할수 있다.
+
+
+
+
+
+
+
+
+
